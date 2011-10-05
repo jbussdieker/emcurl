@@ -1,6 +1,4 @@
 require 'eventmachine'
-ARGV[0] = "www.betaqa.lifetechnologies.com"
-ARGV[1] = "80"
 
 class HTTP < EventMachine::Connection
   def post_init
@@ -16,8 +14,8 @@ class HTTP < EventMachine::Connection
     puts "Connection closed"
     headers, payload = @data.split("\r\n\r\n", 2)
     puts headers
-    File.open("output.html.gz", 'w') {|f| f.write(payload) }
-    `gzip -d -f output.html.gz`
+    File.open("output.html", 'w') {|f| f.write(payload) }
+    #`gzip -d -f output.html.gz`
     EventMachine::stop_event_loop
   end
 end
