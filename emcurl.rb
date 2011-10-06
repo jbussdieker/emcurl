@@ -1,27 +1,44 @@
 require 'eventmachine'
+require 'ruby-debug'
+require 'erb'
+require 'uri'
 
-class HTTP < EventMachine::Connection
-  def post_init
-    @data = ""
-    request = File.read("header")
-    send_data request
+module EMCURL
+  class HTTP < EventMachine::Connection
+    def initialize(*args)
+      super
+      @uri = URI.parse(args[0])
+    end
+    
+    def post_init
+      @data = ""
+      template = ERB.new File.read("header.erb")
+      @headers = template.result(binding)
+      send_data @headers
+    end
+    
+    def receive_data(data)
+      @data << data
+    end
+    
+    def unbind
+      puts "Recieved #{@data.length} bytes"
+      puts "Connection closed"
+      File.open("output.raw", 'w') {|f| f.write(@data) }
+      headers, payload = @data.split("\r\n\r\n", 2)
+      File.open("output.html", 'w') {|f| f.write(payload) }
+      File.open("output.http", 'w') {|f| f.write(headers) }
+      EventMachine::stop_event_loop
+    end
   end
-  def receive_data(data)
-    @data << data
-  end
-  def unbind
-    puts "Recieved #{@data.length} bytes"
-    puts "Connection closed"
-    headers, payload = @data.split("\r\n\r\n", 2)
-    puts headers
-    File.open("output.html", 'w') {|f| f.write(payload) }
-    #`gzip -d -f output.html.gz`
-    EventMachine::stop_event_loop
+  
+  class Curl
+    def self.run(url)
+      uri = URI.parse(url)
+      puts "Connecting to #{uri.host} port #{uri.port}"
+      EventMachine.run {
+        EventMachine.connect uri.host, uri.port, HTTP, url
+      }
+    end
   end
 end
-
-puts "Connecting to #{ARGV[0]} port #{ARGV[1]}"
-EventMachine.run {
-  EventMachine.connect ARGV[0], ARGV[1], HTTP
-}
-
