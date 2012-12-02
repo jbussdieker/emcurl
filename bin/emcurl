@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+require 'emcurl'
+
+options = Emcurl::Options.parse(ARGV)
+Emcurl.configure(options)
+Emcurl.run
