@@ -1,6 +1,8 @@
 # Emcurl
 
-TODO: Write a gem description
+Implement basic curl features in Ruby
+
+[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/jbussdieker/emcurl)
 
 ## Installation
 
