@@ -29,7 +29,7 @@ module Emcurl
       end
 
       opts.parse!(args)
-      options[:url] = args.first
+      options[:url] = args.first || raise(ArgumentError.new("Invalid URL"))
       options
     end
   end

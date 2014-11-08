@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    emcurl (0.0.1)
+    emcurl (0.0.2)
       eventmachine (= 0.12.10)
 
 GEM
